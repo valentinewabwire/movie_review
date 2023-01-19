@@ -1,0 +1,11 @@
+{
+  "name": "review_backend_api",
+  "version": "1.0.0",
+  "description": "movie review back end",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "valentine wabwire",
+  "license": "ISC"
+}
