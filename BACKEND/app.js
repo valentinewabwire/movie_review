@@ -8,9 +8,15 @@ const app = express();
 app.use(express.json());
 app.use("/api/user", userRouter);
 
-app.get("/about", (req, res) => {
-  res.send("<h2>About page</h2>");
-});
+app.get(
+  "/about",
+  (req, res, next) => {
+    next();
+  },
+  (req, res) => {
+    res.send("<h2>About page</h2>");
+  }
+);
 // app.post("/user-create", create);
 
 /* Listening to the port and logging the message to the console. */

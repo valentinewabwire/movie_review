@@ -1,3 +1,4 @@
+/* Connecting to the database. */
 const mongoose = require("mongoose");
 
 mongoose

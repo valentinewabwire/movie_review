@@ -9,8 +9,11 @@
   "author": "valentine wabwire",
   "license": "ISC",
   "dependencies": {
+    "bcrypt": "^5.1.0",
     "express": "^4.18.2",
-    "mongoose": "^6.8.4"
+    "express-validator": "^6.14.2",
+    "mongoose": "^6.8.4",
+    "nodemailer": "^6.9.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.20"
