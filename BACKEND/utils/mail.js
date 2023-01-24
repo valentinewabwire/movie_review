@@ -1,3 +1,4 @@
+const nodemailer = require("nodemailer");
 /* A function that generates a random number of length 6. */
 exports.generateOTP = (otp_length = 6) => {
   let OTP = "";
