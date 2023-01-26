@@ -20,6 +20,11 @@ exports.validatePassword = [
     .withMessage("Password must be 8 to 20 characters"),
 ];
 
+exports.signInValidator = [
+  check("email", "Email is invalid!!").normalizeEmail().isEmail(),
+  check("password", "Password is missing!!").trim().not().isEmpty(),
+];
+
 /* A middleware function that is used to validate the user input. */
 exports.validate = (req, res, next) => {
   const error = validationResult(req).array();

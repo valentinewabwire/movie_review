@@ -1,4 +1,5 @@
 const nodemailer = require("nodemailer");
+require("dotenv").config();
 /* A function that generates a random number of length 6. */
 exports.generateOTP = (otp_length = 6) => {
   let OTP = "";
@@ -15,7 +16,7 @@ exports.generateMailTransporter = () =>
     host: "smtp.mailtrap.io",
     port: 2525,
     auth: {
-      user: "08d9a405d9190e",
-      pass: "91b7e5ab5d1de7",
+      user: process.env.MAILTRAP_USER,
+      pass: process.env.MAILTRAP_PASS,
     },
   });
