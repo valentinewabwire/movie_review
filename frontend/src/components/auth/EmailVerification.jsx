@@ -1,10 +1,27 @@
 import React, { useEffect, useRef } from "react";
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { verifyUserEmail } from "../../api/auth";
+import { useNotification } from "../../hooks";
+import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
+import FormContainer from "../form/FormContainer";
 import Submit from "../form/Submit";
 import Title from "../form/Title";
 
 const OTP_LENGTH = 6;
+
+const isValidOTP = (otp) => {
+  //["","","","","",""]
+  let valid = false;
+
+  for (let val of otp) {
+    valid = !isNaN(parseInt(val));
+    if (!valid) break;
+  }
+
+  return valid;
+};
 
 /**
  * When the user types in a character, the character is added to the otp array, and the focus is moved
@@ -16,6 +33,13 @@ export default function EmailVerification() {
   const [activeOtpIndex, setActiveOtpIndex] = useState(0);
 
   const inputRef = useRef();
+
+  const { updateNotification } = useNotification();
+
+  const { state } = useLocation();
+  const user = state?.user;
+
+  const navigate = useNavigate();
 
   /**
    * When the user enters a digit, focus on the next input field.
@@ -57,18 +81,36 @@ export default function EmailVerification() {
     }
   };
 
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!isValidOTP(otp)) return updateNotification("error", "Invalid OTP");
+
+    const { error, message } = await verifyUserEmail({
+      OTP: otp.join(""),
+      userId: user.id,
+    });
+    if (error) return updateNotification("error", error);
+    return updateNotification("success", message);
+  };
+
   /* Focusing the input field. */
   useEffect(() => {
     inputRef.current?.focus();
   }, [activeOtpIndex]);
 
+  // if(!user) return null;
+  useEffect(() => {
+    if (!user) navigate("/not-found");
+  }, [user]);
+
   return (
-    <div className="fixed inset-0 bg-primary -z-10 flex justify-center items-center">
+    <FormContainer>
       <Container>
-        <form className="bg-secondary rounded p-6 w-96 space-y-6">
+        <form onSubmit={handleSubmit} className={commonModalClasses}>
           <div>
             <Title>Please Enter the OTP to verify your account</Title>
-            <p className="text-center text-dark-subtle">
+            <p className="text-center dark:text-dark-subtle text-light-subtle">
               OTP has been sent tour email
             </p>
           </div>
@@ -83,7 +125,7 @@ export default function EmailVerification() {
                   value={otp[index] || ""}
                   onChange={(e) => handleOtpChange(e, index)}
                   onKeyDown={(e) => handleKeyDown(e, index)}
-                  className="w-12 h-12 border-2 border-dark-subtle focus:border-white rounded bg-transparent outline-none text-center text-white font-semibold text-xl spin-button-none"
+                  className="w-12 h-12 border-2 dark:border-dark-subtle border-light-subtle dark:focus:border-white focus:border-primary rounded bg-transparent outline-none text-center dark:text-white text-primary font-semibold text-xl spin-button-none"
                 />
               );
             })}
@@ -92,6 +134,6 @@ export default function EmailVerification() {
           <Submit value="Verify Account" />
         </form>
       </Container>
-    </div>
+    </FormContainer>
   );
 }

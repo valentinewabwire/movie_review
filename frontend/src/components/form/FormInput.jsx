@@ -6,13 +6,13 @@ export default function FormInput({ name, label, placeholder, ...rest }) {
       <input
         id={name}
         name={name}
-        className="bg-transparent rounded border-2 border-dark-subtle w-full text-lg outline-none focus:border-white p-1 text-white peer transtion"
+        className="bg-transparent rounded border-2 dark:border-dark-subtle border-light-subtle w-full text-lg outline-none dark:focus:border-white focus:border-primary p-1 dark:text-white peer transtion"
         placeholder={placeholder}
         {...rest}
       />
       <label
         htmlFor="email"
-        className="font-semifold  text-dark-subtle peer-focus:text-white transtion self-start"
+        className="font-semifold  dark:text-dark-subtle text-light-subtle dark:peer-focus:text-white peer-focus:text-primary transtion self-start"
       >
         {label}
       </label>

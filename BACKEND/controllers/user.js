@@ -37,15 +37,21 @@ exports.create = async (req, res) => {
     to: newUser.email,
     subject: "Confirm your email to start using Movie review",
     html: `
-    <p>You're well on your way to setting up your Movie review account. We just need to verify your email. </p>
-    <p>Your verification OTP code</p>
-    <h1>${OTP}</h1>
+    <p>Dear ${name}</p>
+    <p>Thanks for joining our movie review site! To ensure that we have your correct email address, <br>we need you to confirm your email by entering the OTP (One-Time Password) below.</p>
+    <h1>OTP ${OTP}</h1>
+    <p>Once you've confirmed your email, you'll be able to start using our site and enjoying all the benefits it has to offer. You'll be able to access the latest movie reviews, trailers, news, and more.</p>
     `,
   });
 
+  /* This is sending a response to the client. The 201 status code means that the request was successful
+and a new resource was created. The response body is the user object that was created. */
   res.status(201).json({
-    message:
-      "Please verify your email. OTP has been sent to your email account!",
+    user: {
+      id: newUser._id,
+      name: newUser.name,
+      email: newUser.email,
+    },
   });
 };
 
@@ -81,11 +87,28 @@ exports.verifyEmail = async (req, res) => {
     to: user.email,
     subject: "Welcome Email",
     html: `
-    <h1>Welcome to our app and thanks for choosing us.😊</h1>
+    <p>Dear ${user.name},</p>
+    <p>We are thrilled to have you join our movie review community! Whether you're a passionate film buff or just a casual moviegoer, we're confident that you'll love the features and benefits of our site.</p>
+    <p>Here's what you can expect:</p>
+    <ul>
+      <li>Access to our extensive database of movie reviews, ratings, trailers, and more</li>
+      <li>The ability to create your own movie lists and share them with others</li>
+      <li>Recommendations based on your personal preferences and viewing history</li>
+      <li>Opportunities to connect with other movie fans and engage in discussions and events</li>
+    </ul>
+    <p>To start taking advantage of all that our site has to offer, simply log in using the email address and password that you used when signing up. If you have any questions or issues, our support team is always here to help.</p>
+    <p>Best regards,</p>
     `,
   });
 
-  res.json({ message: "Your email is verified" });
+  const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
+
+  /* This is sending a response to the client. The 201 status code means that the request was successful
+and a new resource was created. The response body is the user object that was created. */
+  res.json({
+    user: { id: user._id, name: user.name, email: user.email, token: jwtToken },
+    message: "Your email is verified",
+  });
 };
 
 exports.resendEmailVerificationToken = async (req, res) => {
@@ -216,6 +239,9 @@ exports.resetPassword = async (req, res) => {
   });
 };
 
+/* This is the function that will be called when the user clicks on the link in the email. It will
+check if the user exists in the database and if the token is valid. If it is, it will update the
+user's isVerified field to true. */
 exports.signIn = async (req, res, next) => {
   const { email, password } = req.body;
 

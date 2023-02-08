@@ -3,6 +3,7 @@ exports.sendError = (res, error, statusCode = 401) => {
   res.status(statusCode).json({ error });
 };
 
+/* Generating a random byte. */
 exports.generateRandomByte = () => {
   return new Promise((resolve, reject) => {
     crypto.randomBytes(30, (err, buff) => {
@@ -12,4 +13,8 @@ exports.generateRandomByte = () => {
       resolve(buffString);
     });
   });
+};
+
+exports.handleNotFound = (req, res) => {
+  this.sendError(res, "Not Found", 404);
 };
