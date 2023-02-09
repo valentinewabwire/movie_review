@@ -106,7 +106,13 @@ exports.verifyEmail = async (req, res) => {
   /* This is sending a response to the client. The 201 status code means that the request was successful
 and a new resource was created. The response body is the user object that was created. */
   res.json({
-    user: { id: user._id, name: user.name, email: user.email, token: jwtToken },
+    user: {
+      id: user._id,
+      name: user.name,
+      email: user.email,
+      token: jwtToken,
+      isVerified: user.isVerified,
+    },
     message: "Your email is verified",
   });
 };
@@ -144,9 +150,13 @@ exports.resendEmailVerificationToken = async (req, res) => {
     to: user.email,
     subject: "OTP REQUEST",
     html: `
-    <p>Ypu have requested for new OTP kindly use the below</p>
-    <p>Your verification OTP code</p>
-    <h1>${OTP}</h1>
+    <p>Dear ${user.name},</p>
+    <p>We are reaching out to confirm that you recently requested an OTP (One-Time Password) for your account. To ensure the security of your information, we require this additional authentication step.</p>
+    <h1>Your OTP is: <strong>${OTP}</strong></h1>
+    <p>Please use this code within the next 10 minutes to complete your request. If you did not initiate this request, please contact our support team immediately to report any suspicious activity.</p>
+    <p>Thank you for your understanding and cooperation in keeping your account secure.</p>
+    <p>Best regards,</p>
+    <p>Movie Review Team</p>
     `,
   });
 
@@ -257,9 +267,9 @@ exports.signIn = async (req, res, next) => {
   const matched = await user.comparePassword(password);
   if (!matched) return sendError(res, "Email/Password mismatch");
 
-  const { _id, name } = user;
+  const { _id, name, isVerified } = user;
 
   const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 
-  res.json({ user: { id: _id, name, email, token: jwtToken } });
+  res.json({ user: { id: _id, name, email, token: jwtToken, isVerified } });
 };

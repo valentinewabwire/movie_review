@@ -1,9 +1,6 @@
 import React from "react";
+import NotVerified from "./user/NotVerified";
 
 export default function Home() {
-  return (
-    <div>
-      <h1>Home</h1>
-    </div>
-  );
+  return <NotVerified />;
 }

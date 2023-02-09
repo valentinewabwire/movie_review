@@ -138,3 +138,24 @@ export const resetPassword = async (passwordInfo) => {
     return error.message || error;
   }
 };
+
+/**
+ * It sends a request to the server to resend the email verification token
+ * @param userId - string
+ * @returns The response from the server.
+ */
+export const resendEmailVerificationToken = async (userId) => {
+  try {
+    const { data } = await client.post(
+      "/user/resend-email-verification-token",
+      { userId }
+    );
+    return data;
+  } catch (error) {
+    console.log(error.response?.data);
+    const { response } = error;
+    if (response?.data) return response.data;
+
+    return error.message || error;
+  }
+};

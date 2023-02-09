@@ -55,6 +55,14 @@ export default function ConfirmPassword() {
     setPassword({ ...password, [name]: value });
   };
 
+  /**
+   * It takes the password from the form and sends it to the server to reset the password.
+   * @returns const { error, message } = await resetPassword({
+   *       newPassword: password.passwordOne,
+   *       userId: id,
+   *       token,
+   *     });
+   */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!password.passwordOne.trim())
