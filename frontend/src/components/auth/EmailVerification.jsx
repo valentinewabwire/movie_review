@@ -2,7 +2,7 @@ import React, { useEffect, useRef } from "react";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { verifyUserEmail } from "../../api/auth";
-import { useNotification } from "../../hooks";
+import { useAuth, useNotification } from "../../hooks";
 import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
 import FormContainer from "../form/FormContainer";
@@ -31,7 +31,8 @@ const isValidOTP = (otp) => {
 export default function EmailVerification() {
   const [otp, setOtp] = useState(new Array(OTP_LENGTH).fill(""));
   const [activeOtpIndex, setActiveOtpIndex] = useState(0);
-
+  const { isAuth, authInfo } = useAuth();
+  const { isLoggedIn } = authInfo;
   const inputRef = useRef();
 
   const { updateNotification } = useNotification();
@@ -86,12 +87,18 @@ export default function EmailVerification() {
 
     if (!isValidOTP(otp)) return updateNotification("error", "Invalid OTP");
 
-    const { error, message } = await verifyUserEmail({
+    const {
+      error,
+      message,
+      user: userResponse,
+    } = await verifyUserEmail({
       OTP: otp.join(""),
       userId: user.id,
     });
     if (error) return updateNotification("error", error);
-    return updateNotification("success", message);
+    updateNotification("success", message);
+    localStorage.setItem("auth-token", userResponse.token);
+    isAuth();
   };
 
   /* Focusing the input field. */
@@ -102,7 +109,8 @@ export default function EmailVerification() {
   // if(!user) return null;
   useEffect(() => {
     if (!user) navigate("/not-found");
-  }, [user]);
+    if (isLoggedIn) navigate("/");
+  }, [user, isLoggedIn]);
 
   return (
     <FormContainer>

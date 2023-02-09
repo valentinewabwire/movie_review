@@ -26,7 +26,7 @@ export default function App() {
           element={<ForgotPassword />}
         ></Route>
         <Route
-          path="/auth/confirm-password"
+          path="/auth/reset-password"
           element={<ConfirmPassword />}
         ></Route>
         <Route path="*" element={<NotFound />}></Route>

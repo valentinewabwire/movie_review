@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { createUser } from "../../api/auth";
-import { useNotification } from "../../hooks";
+import { useAuth, useNotification } from "../../hooks";
+import { isValidEmail } from "../../utils/helper";
 import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
 import CustomLink from "../CustomLink";
@@ -15,7 +16,6 @@ import Title from "../form/Title";
  * @returns An object with a key of ok and a value of true.
  */
 const validateUserInfo = ({ name, email, password }) => {
-  const isValidEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   const isValidName = /^[a-z A-Z]+$/;
 
   if (!name.trim()) return { ok: false, error: "Name is missing!" };
@@ -23,7 +23,7 @@ const validateUserInfo = ({ name, email, password }) => {
   if (!isValidName.test(name)) return { ok: false, error: "Invalid name!" };
 
   if (!email.trim()) return { ok: false, error: "Email is missing!" };
-  if (!isValidEmail.test(email)) return { ok: false, error: "Invalid Email" };
+  if (!isValidEmail(email)) return { ok: false, error: "Invalid Email" };
   if (!password.trim()) return { ok: false, error: "Password is missing!" };
   if (password.length < 8)
     return { ok: false, error: "Password must be 8 characters long!" };
@@ -39,6 +39,9 @@ export default function Signup() {
   });
 
   const navigate = useNavigate();
+  const { authInfo } = useAuth();
+
+  const { isLoggedIn } = authInfo;
 
   const { updateNotification } = useNotification();
 
@@ -69,6 +72,10 @@ export default function Signup() {
       replace: true,
     });
   };
+
+  useEffect(() => {
+    if (isLoggedIn) navigate("/");
+  }, [isLoggedIn]);
 
   const { name, email, password } = userInfo;
 

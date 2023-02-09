@@ -181,7 +181,7 @@ exports.forgetPassword = async (req, res) => {
 
   /* This is creating a link that will be sent to the user's email. The user will click on this link
   and it will take them to the reset password page. */
-  const resetPasswordUrl = `http://localhost:3200/reset-password?token=${token}&id=${user._id}`;
+  const resetPasswordUrl = `http://localhost:3000/auth/reset-password?token=${token}&id=${user._id}`;
 
   /* Creating a transporter object that will be used to send the email. */
   const transport = generateMailTransporter();
@@ -191,8 +191,14 @@ exports.forgetPassword = async (req, res) => {
     to: user.email,
     subject: "Reset Password Link",
     html: `
-    <p>Click here to reset password</p>
-    <a href='${resetPasswordUrl}'>Change Password</a>
+    <p>Dear ${user.name},</p>
+    <p>We received a request to reset your password. If you did not request this change, please ignore this email.</p>
+    <p>To reset your password, please follow the link below:</p>
+    <p><a href="${resetPasswordUrl}">Reset Password</a></p>
+    <p>If the link does not work, you can copy and paste the link into your web browser. The link will expire in 24 hours for security reasons.</p>
+    <p>If you have any questions or concerns, please contact our support team</p>
+    <p>Best regards,</p>
+    <p>Movie Review Team</p>
     `,
   });
 

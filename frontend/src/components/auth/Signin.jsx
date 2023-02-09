@@ -1,5 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAuth, useNotification } from "../../hooks";
+import { isValidEmail } from "../../utils/helper";
 import { commonModalClasses } from "../../utils/theme";
 import Container from "../Container";
 import CustomLink from "../CustomLink";
@@ -13,10 +15,8 @@ import Title from "../form/Title";
  * @returns An object with a key of ok and a value of true.
  */
 const validateUserInfo = ({ email, password }) => {
-  const isValidEmail = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
   if (!email.trim()) return { ok: false, error: "Email is missing!" };
-  if (!isValidEmail.test(email)) return { ok: false, error: "Invalid Email" };
+  if (!isValidEmail(email)) return { ok: false, error: "Invalid Email" };
   if (!password.trim()) return { ok: false, error: "Password is missing!" };
   if (password.length < 8)
     return { ok: false, error: "Password must be 8 characters long!" };
@@ -30,10 +30,16 @@ export default function Signin() {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
   const { updateNotification } = useNotification();
   const { handleLogin, authInfo } = useAuth();
-  // console.log(authInfo);
+  const { isPending, isLoggedIn } = authInfo;
 
+  /**
+   * The handleChange function takes an event object as an argument, and then uses the event object to
+   * set the state of the userInfo object.
+   */
   const handleChange = ({ target }) => {
     const { value, name } = target;
     setUserInfo({ ...userInfo, [name]: value });
@@ -49,6 +55,10 @@ export default function Signin() {
     if (!ok) return updateNotification("error", error);
     handleLogin(userInfo.email, userInfo.password);
   };
+
+  useEffect(() => {
+    if (isLoggedIn) navigate("/");
+  }, [isLoggedIn]);
 
   return (
     <FormContainer>
@@ -70,7 +80,7 @@ export default function Signin() {
             name="password"
             type="password"
           />
-          <Submit value="Sign In" />
+          <Submit value="Sign In" busy={isPending} />
 
           <div className="flex justify-between">
             <CustomLink to="/auth/forgot-password">Forget Password</CustomLink>
