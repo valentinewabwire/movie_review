@@ -1,5 +1,6 @@
 import React, { createContext, useEffect, useState } from "react";
 import { getIsAuth, signInUser } from "../api/auth";
+import { useNotification } from "../hooks";
 
 export const AuthContext = createContext();
 /* setting the default state of the authInfo object. */
@@ -12,6 +13,7 @@ const defaultAuthInfo = {
 
 export default function AuthProvider({ children }) {
   const [authInfo, setAuthInfo] = useState({ ...defaultAuthInfo });
+  const { updateNotification } = useNotification();
 
   /**
    * handleLogin takes an email and password, sets the isPending state to true, then calls the signInUser function
@@ -27,6 +29,7 @@ export default function AuthProvider({ children }) {
     setAuthInfo({ ...authInfo, isPending: true });
     const { error, user } = await signInUser({ email, password });
     if (error) {
+      updateNotification("error", error);
       return setAuthInfo({ ...authInfo, isPending: false, error });
     }
     setAuthInfo({
@@ -47,6 +50,7 @@ export default function AuthProvider({ children }) {
     const { error, user } = await getIsAuth(token);
 
     if (error) {
+      updateNotification("error", error);
       return setAuthInfo({ ...authInfo, isPending: false, error });
     }
     setAuthInfo({

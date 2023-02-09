@@ -120,3 +120,21 @@ export const verifyPasswordResetToken = async (token, userId) => {
     return error.message || error;
   }
 };
+
+/**
+ * It takes in a passwordInfo object, sends it to the server, and returns the response
+ * @param passwordInfo - {
+ * @returns The data from the response.
+ */
+export const resetPassword = async (passwordInfo) => {
+  try {
+    const { data } = await client.post("/user/reset-password", passwordInfo);
+    return data;
+  } catch (error) {
+    console.log(error.response?.data);
+    const { response } = error;
+    if (response?.data) return response.data;
+
+    return error.message || error;
+  }
+};
