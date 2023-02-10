@@ -273,3 +273,27 @@ exports.signIn = async (req, res, next) => {
 
   res.json({ user: { id: _id, name, email, token: jwtToken, isVerified } });
 };
+
+// const fs = require('fs');
+
+// let template = fs.readFileSync('template.html', 'utf-8');
+// template = template.replace('{{user.name}}', user.name);
+// template = template.replace('{{resetPasswordUrl}}', resetPasswordUrl);
+
+// transport.sendMail({
+//     from: "security@pes.co.ke",
+//     to: user.email,
+//     subject: "Reset Password Link",
+//     html: template,
+//   });
+
+{
+  /* <p>Dear {{user.name}},</p>
+<p>We received a request to reset your password. If you did not request this change, please ignore this email.</p>
+<p>To reset your password, please follow the link below:</p>
+<p><a href="{{resetPasswordUrl}}">Reset Password</a></p>
+<p>If the link does not work, you can copy and paste the link into your web browser. The link will expire in 24 hours for security reasons.</p>
+<p>If you have any questions or concerns, please contact our support team</p>
+<p>Best regards,</p>
+<p>Movie Review Team</p> */
+}

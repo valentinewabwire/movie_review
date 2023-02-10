@@ -6,6 +6,7 @@ const { create } = require("./controllers/user");
 const { errorHandler } = require("./middlewares/error");
 const cors = require("cors");
 const userRouter = require("./routes/user");
+const actorRouter = require("./routes/actor");
 const { handleNotFound } = require("./utils/helper");
 const port = 8500;
 const app = express();
@@ -13,6 +14,7 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 app.use("/api/user", userRouter);
+app.use("/api/actor", actorRouter);
 
 app.use("/*", handleNotFound);
 

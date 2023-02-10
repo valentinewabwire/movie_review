@@ -25,6 +25,12 @@ exports.signInValidator = [
   check("password", "Password is missing!!").trim().not().isEmpty(),
 ];
 
+exports.actorInfoValidator = [
+  check("name", "Name is missing").trim().not().isEmpty(),
+  check("about", "About is a required field!").trim().not().isEmpty(),
+  check("gender", "Gender is a required field!").trim().not().isEmpty(),
+];
+
 /* A middleware function that is used to validate the user input. */
 exports.validate = (req, res, next) => {
   const error = validationResult(req).array();

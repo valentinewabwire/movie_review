@@ -18,3 +18,11 @@ exports.generateRandomByte = () => {
 exports.handleNotFound = (req, res) => {
   this.sendError(res, "Not Found", 404);
 };
+
+exports.uploadImageTocloud = async (file) => {
+  const { secure_url: url, public_id } = await cloudinary.uploader.upload(
+    file.path,
+    { gravity: "face", height: 500, width: 500, crop: "thumb" }
+  );
+  return { url, public_id };
+};
