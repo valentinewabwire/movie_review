@@ -81,6 +81,7 @@ exports.removeActor = async (req, res) => {
   const public_id = actor.avatar?.public_id;
 
   if (public_id) {
+    console.log(public_id);
     const { result } = await cloudinary.uploader.destroy(public_id);
 
     if (result !== "ok")

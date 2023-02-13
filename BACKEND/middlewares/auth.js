@@ -5,6 +5,7 @@ const { sendError } = require("../utils/helper");
 /* This is a middleware function that checks if the user is authenticated. */
 exports.isAuth = async (req, res, next) => {
   const token = req.headers?.authorization;
+  if (!token) return sendError(res, "Invalid token");
   const jwtToken = token.split("Bearer ")[1];
 
   if (!jwtToken) return sendError(res, "Invalid token");
@@ -15,5 +16,13 @@ exports.isAuth = async (req, res, next) => {
   if (!user) return sendError(res, "Invalid token User not found", 404);
 
   req.user = user;
+  next();
+};
+
+exports.isAdmin = (req, res, next) => {
+  const { user } = req;
+
+  if (user.role !== "admin") return sendError(res, "Unauthorised access");
+
   next();
 };
