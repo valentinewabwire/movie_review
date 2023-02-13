@@ -1,14 +1,14 @@
 const { isValidObjectId } = require("mongoose");
 const Actor = require("../models/actor");
-const { sendError } = require("../utils/helper");
-const cloudinary = require("cloudinary").v2;
+const { sendError, formatActor } = require("../utils/helper");
+const cloudinary = require("../cloud");
 
 // Configuration
-cloudinary.config({
-  cloud_name: process.env.CLOUD_API_NAME,
-  api_key: process.env.CLOUD_API_KEY,
-  api_secret: process.env.CLOUD_API_SECRET,
-});
+// cloudinary.config({
+//   cloud_name: process.env.CLOUD_API_NAME,
+//   api_key: process.env.CLOUD_API_KEY,
+//   api_secret: process.env.CLOUD_API_SECRET,
+// });
 
 /* Creating a new actor. */
 exports.createActor = async (req, res) => {
@@ -27,13 +27,7 @@ exports.createActor = async (req, res) => {
 
   /* This is saving the new actor to the database and then returning the new actor's information. for front end purposes */
   await newActor.save();
-  res.status(201).json({
-    id: newActor._d,
-    name,
-    about,
-    gender,
-    avatar: newActor.avatar?.url,
-  });
+  res.status(201).json(formatActor(newActor));
 };
 
 /* The updateActor code is updating the actor. */
@@ -71,13 +65,7 @@ exports.updateActor = async (req, res) => {
   actor.gender = gender;
 
   await actor.save();
-  res.status(201).json({
-    id: actor._d,
-    name,
-    about,
-    gender,
-    avatar: actor.avatar?.url,
-  });
+  res.status(201).json(formatActor(actor));
 };
 
 /* removeActor is removing an actor from the database. */
@@ -108,13 +96,17 @@ exports.searchActor = async (req, res) => {
   const { query } = req;
   query.name;
   const result = await Actor.find({ $text: { $search: `"${query.name}"` } });
-  res.json(result);
+
+  const actors = result.map((actor) => formatActor(actor));
+  res.json(actors);
 };
 
 /* This is a function that is getting the latest actors. */
 exports.getLatestActors = async (req, res) => {
   const result = await Actor.find().sort({ createdAt: "-1" }).limit(12);
-  res.json(result);
+
+  const actors = result.map((actor) => formatActor(actor));
+  res.json(actors);
 };
 
 exports.getSingleActor = async (req, res) => {
@@ -123,5 +115,6 @@ exports.getSingleActor = async (req, res) => {
   const actor = await Actor.findById(id);
   if (!isValidObjectId(actor))
     return sendError(res, "Invalid Request,actor not found", 404);
-  res.json(actor);
+
+  res.json(formatActor(actor));
 };
