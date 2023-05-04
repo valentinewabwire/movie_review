@@ -112,6 +112,7 @@ and a new resource was created. The response body is the user object that was cr
       email: user.email,
       token: jwtToken,
       isVerified: user.isVerified,
+      role: user.role,
     },
     message: "Your email is verified",
   });

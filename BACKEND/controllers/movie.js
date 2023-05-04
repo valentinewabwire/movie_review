@@ -183,6 +183,8 @@ exports.updateMovieWithoutPoster = async (req, res) => {
   await movie.save();
   res.json({ message: "Movie is updated", movie });
 };
+
+/* This is the code for updating the movie with the poster. */
 exports.updateMovieWithPoster = async (req, res) => {
   const { movieId } = req.params;
   const movieIdFinal = movieId.trim().replace(/"/g, "");
@@ -195,6 +197,7 @@ exports.updateMovieWithPoster = async (req, res) => {
   const movie = await Movie.findById(movieId);
   if (!movie) return sendError(res, "Movie not Found", 404);
 
+  /* Destructuring the req.body object. */
   const {
     title,
     storyLine,
@@ -221,6 +224,10 @@ exports.updateMovieWithPoster = async (req, res) => {
   movie.trailer = trailer;
   movie.language = language;
 
+  /* This is checking if the director is present in the request body. If it is present, then it is
+trimming the director id and replacing the double quotes with empty string. Then it is checking if
+the director id is valid or not. If it is valid, then it is assigning the director id to the movie
+object. */
   if (director) {
     const test = director.trim().replace(/"/g, "");
     const objId = new mongoose.Types.ObjectId(test);
@@ -230,6 +237,9 @@ exports.updateMovieWithPoster = async (req, res) => {
     movie.director = objId;
   }
 
+  /* This is checking if the writers are present in the request body. If it is present, then it is
+checking if the writer id is valid or not. If it is valid, then it is assigning the writer id to the
+movie object. */
   if (writers) {
     for (let writerId of writers) {
       if (!isValidObjectId(writerId))
@@ -283,6 +293,7 @@ exports.updateMovieWithPoster = async (req, res) => {
   await movie.save();
   res.json({ message: "Movie is updated", movie });
 };
+/* Removing the movie from the database and also removing the poster and trailer from the cloudinary. */
 
 exports.removeMovie = async (req, res) => {
   const { movieId } = req.params;
