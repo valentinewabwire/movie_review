@@ -26,11 +26,11 @@
 
 .animate-scale {
   transform-origin: 0% 0%;
-  animation: scale 0.2s reverse forwards;
+  animation: scale 0.2s;
 }
 .animate-scale-reverse {
   transform-origin: 0% 0%;
-  animation: scale 0.2s;
+  animation: scale 0.2s reverse forwards;
 }
 
 @keyframes scale {

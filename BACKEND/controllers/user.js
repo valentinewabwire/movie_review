@@ -6,6 +6,8 @@ const PasswordResetToken = require("../models/passwordResetToken");
 const { isValidObjectId } = require("mongoose");
 const { generateOTP, generateMailTransporter } = require("../utils/mail");
 const { sendError, generateRandomByte } = require("../utils/helper");
+const ejs = require("ejs");
+const path = require("path");
 
 exports.create = async (req, res) => {
   const { name, email, password } = req.body;
@@ -81,25 +83,37 @@ exports.verifyEmail = async (req, res) => {
   //   console.log(token._id);
 
   var transport = generateMailTransporter();
+  ejs.renderFile("views/welcome_email.ejs", { user: user }, (err, html) => {
+    if (err) {
+      console.error("Error rendering EJS template:", err);
+      return;
+    }
 
-  transport.sendMail({
-    from: "verification@pes.co.ke",
-    to: user.email,
-    subject: "Welcome Email",
-    html: `
-    <p>Dear ${user.name},</p>
-    <p>We are thrilled to have you join our movie review community! Whether you're a passionate film buff or just a casual moviegoer, we're confident that you'll love the features and benefits of our site.</p>
-    <p>Here's what you can expect:</p>
-    <ul>
-      <li>Access to our extensive database of movie reviews, ratings, trailers, and more</li>
-      <li>The ability to create your own movie lists and share them with others</li>
-      <li>Recommendations based on your personal preferences and viewing history</li>
-      <li>Opportunities to connect with other movie fans and engage in discussions and events</li>
-    </ul>
-    <p>To start taking advantage of all that our site has to offer, simply log in using the email address and password that you used when signing up. If you have any questions or issues, our support team is always here to help.</p>
-    <p>Best regards,</p>
-    `,
+    transport.sendMail({
+      from: "verification@pes.co.ke",
+      to: user.email,
+      subject: "Welcome Email",
+      html: html,
+    });
   });
+  // transport.sendMail({
+  //   from: "verification@pes.co.ke",
+  //   to: user.email,
+  //   subject: "Welcome Email",
+  //   html: `
+  //   <p>Dear ${user.name},</p>
+  //   <p>We are thrilled to have you join our movie review community! Whether you're a passionate film buff or just a casual moviegoer, we're confident that you'll love the features and benefits of our site.</p>
+  //   <p>Here's what you can expect:</p>
+  //   <ul>
+  //     <li>Access to our extensive database of movie reviews, ratings, trailers, and more</li>
+  //     <li>The ability to create your own movie lists and share them with others</li>
+  //     <li>Recommendations based on your personal preferences and viewing history</li>
+  //     <li>Opportunities to connect with other movie fans and engage in discussions and events</li>
+  //   </ul>
+  //   <p>To start taking advantage of all that our site has to offer, simply log in using the email address and password that you used when signing up. If you have any questions or issues, our support team is always here to help.</p>
+  //   <p>Best regards,</p>
+  //   `,
+  // });
 
   const jwtToken = jwt.sign({ userId: user._id }, process.env.JWT_SECRET);
 

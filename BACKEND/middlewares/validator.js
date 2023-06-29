@@ -20,7 +20,13 @@ exports.validatePassword = [
     .not()
     .isEmpty()
     .isLength({ min: 8, max: 20 })
-    .withMessage("Password must be 8 to 20 characters"),
+    .withMessage("Password must be 8 to 20 characters")
+    .matches(/[a-z]/, "i")
+    .withMessage("Password must contain at least one lowercase letter")
+    .matches(/[A-Z]/, "i")
+    .withMessage("Password must contain at least one uppercase letter")
+    .matches(/[0-9]/, "i")
+    .withMessage("Password must contain at least one number"),
 ];
 
 exports.signInValidator = [
