@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 
-export default function TagsInput() {
+export default function TagsInput({ name, onChange }) {
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
   const inputRef = useRef(null);
@@ -10,6 +10,7 @@ export default function TagsInput() {
   const handleOnChange = ({ target }) => {
     const { value } = target;
     if (value !== ",") setTag(value);
+    onChange(tags);
   };
 
   const handleKeyDown = (event) => {
@@ -70,6 +71,7 @@ export default function TagsInput() {
         ))}
         <input
           ref={inputRef}
+          id={name}
           type="text"
           className="h-full flex-grow bg-transparent outline-none dark:text-white"
           placeholder="Tag"
