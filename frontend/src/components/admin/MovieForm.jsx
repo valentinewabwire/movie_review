@@ -5,6 +5,8 @@ import { commonInputClasses } from "../../utils/theme";
 import Submit from "../form/Submit";
 import { useNotification } from "../../hooks";
 import ModalContainer from "../modals/ModalContainer";
+import WritersModal from "../modals/WritersModal";
+import CastForm from "../form/CastForm";
 
 export const results = [
   {
@@ -45,6 +47,24 @@ export const results = [
   },
 ];
 
+/**
+ * The `renderItem` function returns a JSX element that displays an image and a name.
+ * @returns The function `renderItem` is returning a JSX element.
+ */
+export const renderItem = (result) => {
+  return (
+    <div key={result.id} className="flex space-x-2 rounded overflow-hidden">
+      {" "}
+      <img
+        src={result.avatar}
+        alt={result.name}
+        className="w-16 h-16 object-cover"
+      />
+      <p className="dark:text-white font-semibold">{result.name}</p>
+    </div>
+  );
+};
+
 const defaultMovieInfo = {
   title: "",
   storyLine: "",
@@ -62,7 +82,7 @@ const defaultMovieInfo = {
 
 export default function MovieForm() {
   const [movieInfo, setMovieInfo] = useState({ ...defaultMovieInfo });
-  const [showModal, setShowModal] = useState(false);
+  const [showWritersModal, setShowWritersModal] = useState(false);
 
   const { updateNotification } = useNotification();
   const handleSubmit = (e) => {
@@ -70,27 +90,19 @@ export default function MovieForm() {
     console.log(movieInfo);
   };
 
-  const renderItem = (result) => {
-    return (
-      <div className="flex space-x-2 rounded overflow-hidden">
-        {" "}
-        <img
-          src={result.avatar}
-          alt={result.name}
-          className="w-16 h-16 object-cover"
-        />
-        <p className="dark:text-white font-semibold">{result.name}</p>
-      </div>
-    );
-  };
-
   const handleChange = ({ target }) => {
     const { value, name } = target;
     setMovieInfo({ ...movieInfo, [name]: value });
   };
+
   const updateTags = (tags) => {
     setMovieInfo({ ...movieInfo, tags });
   };
+
+  const updateCast = (profile) => {
+    setMovieInfo({ ...movieInfo, cast: profile });
+  };
+
   const updateDirecor = (profile) => {
     setMovieInfo({ ...movieInfo, director: profile });
   };
@@ -109,6 +121,24 @@ export default function MovieForm() {
     setMovieInfo({ ...movieInfo, writers: [...writers, profile] });
   };
 
+  const hideWriterModal = () => {
+    setShowWritersModal(false);
+  };
+
+  const displayWritersModal = () => {
+    setShowWritersModal(true);
+  };
+
+  /**
+   * The function `handleWriterRemove` removes a writer from the `movieInfo` object and hides the writer
+   * modal if there are no more writers left.
+   */
+  const handleWriterRemove = (profileId) => {
+    const { writers } = movieInfo;
+    const newWriters = writers.filter(({ id }) => id !== profileId);
+    if (!newWriters.length) hideWriterModal();
+    setMovieInfo({ ...movieInfo, writers: [...newWriters] });
+  };
   const { title, storyLine, director, writers } = movieInfo;
   return (
     <>
@@ -160,7 +190,7 @@ export default function MovieForm() {
                 Writers
               </LabelWithBadge>
               <button
-                onClick={() => setShowModal(true)}
+                onClick={displayWritersModal}
                 className="dark:text-white text-primary hover:underline transition"
               >
                 View All
@@ -174,14 +204,21 @@ export default function MovieForm() {
               onSelect={updateWriters}
             />
           </div>
+          <div>
+            <LabelWithBadge>Add Cast & Crew</LabelWithBadge>
+            <CastForm onSubmit={updateCast} />
+          </div>
 
           <Submit value="Upload" />
         </div>
         <div className="w-[30%] h-5"></div>
       </form>
-      <ModalContainer onClose={() => setShowModal(false)} visible={showModal}>
-        <div className="p-20 bg-red-50"></div>
-      </ModalContainer>
+      <WritersModal
+        onClose={hideWriterModal}
+        profiles={writers}
+        visible={showWritersModal}
+        onRemoveClick={handleWriterRemove}
+      />
     </>
   );
 }
@@ -197,7 +234,7 @@ const Label = ({ children, htmlFor }) => {
   );
 };
 
-const LabelWithBadge = ({ children, htmlFor, badge }) => {
+const LabelWithBadge = ({ children, htmlFor, badge = 0 }) => {
   const renderBadge = () => {
     return (
       <span className="dark:bg-dark-subtle bg-light-subtle absolute top-0 right-0 translate-x-2 -translate-y-1 text-xs w-5 h-5 rounded-full flex justify-center items-center">
