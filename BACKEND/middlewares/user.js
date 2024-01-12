@@ -4,7 +4,12 @@ const { sendError } = require("../utils/helper");
 exports.isValidPassResetToken = async (req, res, next) => {
   const { token, userId } = req.body;
 
-  if (!token.trim() || !isValidObjectId(userId))
+  if (
+    token === null ||
+    token === undefined ||
+    !token.trim() ||
+    !isValidObjectId(userId)
+  )
     return sendError(res, "Invalid Request!");
 
   const resetToken = await PasswordResetToken.findOne({ owner: userId });

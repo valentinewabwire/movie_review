@@ -7,6 +7,10 @@ import { useNotification } from "../../hooks";
 import ModalContainer from "../modals/ModalContainer";
 import WritersModal from "../modals/WritersModal";
 import CastForm from "../form/CastForm";
+import CastModal from "../modals/CastModal";
+import PosterSelector from "../PosterSelector";
+import GenresSelector from "../GenresSelector";
+import GenresModal from "../modals/GenresModal";
 
 export const results = [
   {
@@ -83,6 +87,9 @@ const defaultMovieInfo = {
 export default function MovieForm() {
   const [movieInfo, setMovieInfo] = useState({ ...defaultMovieInfo });
   const [showWritersModal, setShowWritersModal] = useState(false);
+  const [showCastModal, setShowCastModal] = useState(false);
+  const [showGenresModal, setshowGenresModal] = useState(false);
+  const [selectedPosterForUI, setselectedPosterForUI] = useState("");
 
   const { updateNotification } = useNotification();
   const handleSubmit = (e) => {
@@ -90,8 +97,18 @@ export default function MovieForm() {
     console.log(movieInfo);
   };
 
+  const updatePosterForUI = (file) => {
+    const url = URL.createObjectURL(file);
+    setselectedPosterForUI(url);
+  };
+
   const handleChange = ({ target }) => {
-    const { value, name } = target;
+    const { value, name, files } = target;
+    if (name === "poster") {
+      const poster = files[0];
+      updatePosterForUI(poster);
+      return setMovieInfo({ ...movieInfo, poster });
+    }
     setMovieInfo({ ...movieInfo, [name]: value });
   };
 
@@ -99,8 +116,9 @@ export default function MovieForm() {
     setMovieInfo({ ...movieInfo, tags });
   };
 
-  const updateCast = (profile) => {
-    setMovieInfo({ ...movieInfo, cast: profile });
+  const updateCast = (castInfo) => {
+    const { cast } = movieInfo;
+    setMovieInfo({ ...movieInfo, cast: [...cast, castInfo] });
   };
 
   const updateDirecor = (profile) => {
@@ -129,6 +147,22 @@ export default function MovieForm() {
     setShowWritersModal(true);
   };
 
+  const hideCastModal = () => {
+    setShowCastModal(false);
+  };
+
+  const displayCastsModal = () => {
+    setShowCastModal(true);
+  };
+
+  const hideGenresModal = () => {
+    setshowGenresModal(false);
+  };
+
+  const displayGenresModay = () => {
+    setshowGenresModal(true);
+  };
+
   /**
    * The function `handleWriterRemove` removes a writer from the `movieInfo` object and hides the writer
    * modal if there are no more writers left.
@@ -139,7 +173,7 @@ export default function MovieForm() {
     if (!newWriters.length) hideWriterModal();
     setMovieInfo({ ...movieInfo, writers: [...newWriters] });
   };
-  const { title, storyLine, director, writers } = movieInfo;
+  const { title, storyLine, director, writers, cast, tags } = movieInfo;
   return (
     <>
       <form onSubmit={handleSubmit} className="flex space-x-3">
@@ -171,7 +205,7 @@ export default function MovieForm() {
           </div>
           <div>
             <Label htmlFor="tags">Tags</Label>
-            <TagsInput name="tags" onChange={updateTags} />
+            <TagsInput value={tags} name="tags" onChange={updateTags} />
           </div>
           <div>
             <Label htmlFor="director">Director</Label>
@@ -189,12 +223,12 @@ export default function MovieForm() {
               <LabelWithBadge badge={writers.length} htmlFor="writers">
                 Writers
               </LabelWithBadge>
-              <button
+              <ViewAllBtn
                 onClick={displayWritersModal}
-                className="dark:text-white text-primary hover:underline transition"
+                visible={writers.length}
               >
                 View All
-              </button>
+              </ViewAllBtn>
             </div>
             <LiveSearch
               name="writers"
@@ -205,13 +239,35 @@ export default function MovieForm() {
             />
           </div>
           <div>
-            <LabelWithBadge>Add Cast & Crew</LabelWithBadge>
+            <div className="flex justify-between">
+              <LabelWithBadge badge={cast.length}>
+                Add Cast & Crew
+              </LabelWithBadge>
+              <ViewAllBtn onClick={displayCastsModal} visible={cast.length}>
+                View All
+              </ViewAllBtn>
+            </div>
             <CastForm onSubmit={updateCast} />
           </div>
 
-          <Submit value="Upload" />
+          <input
+            type="date"
+            className={commonInputClasses + " border-2 rounded p-1 w-auto"}
+            onChange={handleChange}
+            name="releaseDate"
+          />
+
+          <Submit value="Upload" onClick={handleSubmit} type="button" />
         </div>
-        <div className="w-[30%] h-5"></div>
+        <div className="w-[30%] space-y-5">
+          <PosterSelector
+            name="poster"
+            onChange={handleChange}
+            selectedPoster={selectedPosterForUI}
+            accept="image/jpg,image/jpeg,image/png"
+          />
+          <GenresSelector onClick={displayGenresModay} />
+        </div>
       </form>
       <WritersModal
         onClose={hideWriterModal}
@@ -219,6 +275,13 @@ export default function MovieForm() {
         visible={showWritersModal}
         onRemoveClick={handleWriterRemove}
       />
+      <CastModal
+        onClose={hideCastModal}
+        casts={cast}
+        visible={showCastModal}
+        onRemoveClick={handleWriterRemove}
+      />
+      <GenresModal visible={showGenresModal} onClose={hideGenresModal} />
     </>
   );
 }
@@ -236,6 +299,7 @@ const Label = ({ children, htmlFor }) => {
 
 const LabelWithBadge = ({ children, htmlFor, badge = 0 }) => {
   const renderBadge = () => {
+    if (!badge) return null;
     return (
       <span className="dark:bg-dark-subtle bg-light-subtle absolute top-0 right-0 translate-x-2 -translate-y-1 text-xs w-5 h-5 rounded-full flex justify-center items-center">
         {badge <= 9 ? badge : "9+"}
@@ -247,5 +311,17 @@ const LabelWithBadge = ({ children, htmlFor, badge = 0 }) => {
       <Label htmlFor={htmlFor}>{children}</Label>
       {renderBadge()}
     </div>
+  );
+};
+
+const ViewAllBtn = ({ visible, children, onClick }) => {
+  if (!visible) return null;
+  return (
+    <button
+      onClick={onClick}
+      className="dark:text-white text-primary hover:underline transition"
+    >
+      {children}
+    </button>
   );
 };

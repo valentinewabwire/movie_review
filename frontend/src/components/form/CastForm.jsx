@@ -15,7 +15,7 @@ export default function CastForm({ onSubmit }) {
   const [castInfo, setCastInfo] = useState({ ...defaultCastInfo });
   const { leadActor, profile, roleAs } = castInfo;
 
-  const { updateNotification } = useNotification;
+  const { updateNotification } = useNotification();
 
   const handleOnChange = ({ target }) => {
     const { checked, name, value } = target;
@@ -51,6 +51,7 @@ export default function CastForm({ onSubmit }) {
         className="w-4 h-4"
         checked={leadActor}
         onChange={handleOnChange}
+        title="Set as lead Actor"
       />
       <LiveSearch
         placeholder="Search profile"
