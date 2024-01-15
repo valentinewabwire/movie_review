@@ -33,7 +33,8 @@ export default function CastForm({ onSubmit }) {
    * the `onSubmit` function with the cast information and resets the cast information state.
    * @returns The function `handleSubmit` returns nothing (undefined).
    */
-  const handleSubmit = () => {
+  const handleSubmit = (e) => {
+    e.preventDefault();
     const { profile, roleAs } = castInfo;
     if (!profile.name)
       return updateNotification("error", "Cast profile is missing!!");
@@ -75,7 +76,6 @@ export default function CastForm({ onSubmit }) {
       </div>
       <button
         onClick={handleSubmit}
-        type="button"
         className="bg-secondary dark:bg-white dark:text-primary text-white px-1 rounded"
       >
         Add

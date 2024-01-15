@@ -12,9 +12,7 @@ export default function ModalContainer({
   ignoreContainer,
 }) {
   const handleClick = (e) => {
-    if (e.target === e.currentTarget) {
-      onClose();
-    }
+    if (e.target.id === "modal-container") onClose();
   };
   const renderChildren = () => {
     if (ignoreContainer) return children;
@@ -30,7 +28,7 @@ export default function ModalContainer({
     <div
       onClick={handleClick}
       id="modal-container"
-      className="fixed inset-0 dark:bg-white dark:bg-opacity-50 bg-primary bg-opacity-50 backdrop-blur-sm flex items-center justify-center custom-scroll-bar"
+      className="fixed inset-0 dark:bg-white dark:bg-opacity-50 bg-primary bg-opacity-50 backdrop-blur-sm flex items-center justify-center"
     >
       {renderChildren()}
     </div>

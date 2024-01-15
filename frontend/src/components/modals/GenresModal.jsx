@@ -1,8 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import ModalContainer from "./ModalContainer";
 import genres from "../../utils/genres";
+import Submit from "../form/Submit";
 
-export default function GenresModal({ visible, onClose }) {
+export default function GenresModal({
+  visible,
+  previousSelection,
+  onClose,
+  onSubmit,
+}) {
   const [selectedGenres, setselectedGenres] = useState([]);
   /**
    * The function `handleGenresSelector` updates the selected genres by either adding or removing a genre
@@ -16,34 +22,53 @@ export default function GenresModal({ visible, onClose }) {
     else newGenres = [...selectedGenres, gen];
     setselectedGenres([...newGenres]);
   };
+
+  const handleSubmit = () => {
+    console.log("selectedGenres");
+    onSubmit(selectedGenres);
+    console.log("selectedGenres");
+    console.log(selectedGenres);
+    onClose();
+  };
+
+  const handleClose = () => {
+    setselectedGenres(previousSelection);
+    onClose();
+  };
+
+  useEffect(() => {
+    setselectedGenres(previousSelection);
+  }, []);
   return (
-    <ModalContainer visible={visible} onClose={onClose}>
-      <h1 className="dark:text-white text-primary text-2xl font-semibold text-center">
-        Select Genres
-      </h1>
-      <div className="space-y-3">
-        {genres.map((gen) => {
-          return (
-            <Genre
-              onClick={() => handleGenresSelector(gen)}
-              selected={selectedGenres.includes(gen)}
-              key={gen}
-            >
-              {gen}
-            </Genre>
-          );
-        })}
+    <ModalContainer visible={visible} onClose={handleClose}>
+      <div className="flex flex-col justify-between h-full">
+        <div>
+          <h1 className="dark:text-white text-primary text-2xl font-semibold text-center">
+            Select Genres
+          </h1>
+          <div className="space-y-3">
+            {genres.map((gen) => {
+              return (
+                <Genre
+                  onClick={() => handleGenresSelector(gen)}
+                  selected={selectedGenres.includes(gen)}
+                  key={gen}
+                >
+                  {gen}
+                </Genre>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="w-56 self-end">
+          <Submit value="Select" type="button" onClick={handleSubmit} />
+        </div>
       </div>
     </ModalContainer>
   );
 }
 
-/**
- * The Genre component is a button that can be selected or deselected, and it changes its style based
- * on its selected state.
- * @returns The Genre component is returning a button element with the specified className and children
- * as its content.
- */
 const Genre = ({ children, selected, onClick }) => {
   const getSelectedStyle = () => {
     return selected

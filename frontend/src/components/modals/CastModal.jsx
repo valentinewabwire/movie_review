@@ -33,10 +33,10 @@ export default function CastModal({
                   <p className="text-sm dark:text-dark-subtle text-light-subtle">
                     {roleAs}
                   </p>
+                </div>
                   {leadActor && (
                     <AiOutlineCheck className="text-light-subtle dark:text-dark-subtle" />
                   )}
-                </div>
               </div>
               <button
                 onClick={() => onRemoveClick(id)}

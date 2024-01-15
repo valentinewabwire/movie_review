@@ -4,7 +4,7 @@ import { AiOutlineClose } from "react-icons/ai";
 export default function TagsInput({ name, value, onChange }) {
   const [tag, setTag] = useState("");
   const [tags, setTags] = useState([]);
-  const inputRef = useRef(null);
+  const inputRef = useRef();
   const tagsInput = useRef();
 
   const handleOnChange = ({ target }) => {
@@ -13,10 +13,8 @@ export default function TagsInput({ name, value, onChange }) {
     onChange(tags);
   };
 
-  const handleKeyDown = (event) => {
-    const { key } = event;
+  const handleKeyDown = ({ key }) => {
     if (key === "," || key === "Enter") {
-      event.preventDefault(); // prevents form submission on "Enter" and prevents adding a comma to the input field
       if (!tag) return;
       if (tags.includes(tag)) return setTag("");
 
@@ -31,7 +29,6 @@ export default function TagsInput({ name, value, onChange }) {
   const removeTag = (tagToRemove) => {
     const newTags = tags.filter((tag) => tag !== tagToRemove);
     setTags([...newTags]);
-    inputRef.current.focus();
   };
 
   const handleOnFocus = () => {
@@ -39,7 +36,7 @@ export default function TagsInput({ name, value, onChange }) {
       "dark:border-dark-subtle",
       "border-light-subtle"
     );
-    tagsInput.current.classList.add("dark:border-dark-white", "border-primary");
+    tagsInput.current.classList.add("dark:border-white", "border-primary");
   };
 
   const handleOnBlur = () => {
@@ -47,10 +44,7 @@ export default function TagsInput({ name, value, onChange }) {
       "dark:border-dark-subtle",
       "border-light-subtle"
     );
-    tagsInput.current.classList.remove(
-      "dark:border-dark-white",
-      "border-primary"
-    );
+    tagsInput.current.classList.remove("dark:border-white", "border-primary");
   };
 
   useEffect(() => {
@@ -58,7 +52,7 @@ export default function TagsInput({ name, value, onChange }) {
   }, [value]);
 
   useEffect(() => {
-    inputRef.current.scrollIntoView();
+    inputRef.current.scrollIntoView(false);
   }, [tag]);
 
   return (
@@ -75,10 +69,10 @@ export default function TagsInput({ name, value, onChange }) {
         ))}
         <input
           ref={inputRef}
-          id={name}
           type="text"
-          className="h-full flex-grow bg-transparent outline-none dark:text-white"
-          placeholder="Tag"
+          id={name}
+          className="h-full flex-grow bg-transparent outline-none dark:text-white text-primary"
+          placeholder="Tag one, Tag two"
           value={tag}
           onChange={handleOnChange}
           onFocus={handleOnFocus}

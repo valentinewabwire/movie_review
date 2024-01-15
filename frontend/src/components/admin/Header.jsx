@@ -69,6 +69,11 @@ const CreateOptions = ({ options, buttonRef, visible, onClose }) => {
     };
   }, [visible, buttonRef, onClose]);
 
+  const handleClick = (fn) => {
+    fn();
+    onClose();
+  };
+
   if (!visible) return null;
   return (
     <div
@@ -76,7 +81,11 @@ const CreateOptions = ({ options, buttonRef, visible, onClose }) => {
       className="absolute right-9 top-12 flex flex-col space-y-3 p-5 dark:bg-secondary bg-white drop-shadow-lg rounded animate-scale "
     >
       {options.map(({ title, onClick }) => {
-        return <Option onClick={onClick}>{title}</Option>;
+        return (
+          <Option key={title} onClick={() => handleClick(onClick)}>
+            {title}
+          </Option>
+        );
       })}
       {/* <Option>Add Movie</Option>
       <Option>Add Actor</Option> */}
