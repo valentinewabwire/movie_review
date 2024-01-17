@@ -3,7 +3,7 @@ import TagsInput from "../TagsInput";
 import LiveSearch from "../LiveSearch";
 import { commonInputClasses } from "../../utils/theme";
 import Submit from "../form/Submit";
-import { useNotification } from "../../hooks";
+import { useNotification, useSearch } from "../../hooks";
 import ModalContainer from "../modals/ModalContainer";
 import WritersModal from "../modals/WritersModal";
 import CastForm from "../form/CastForm";
@@ -17,6 +17,13 @@ import {
   statusOptions,
   typeOptions,
 } from "../../utils/options";
+import { searchActor } from "../../api/actor";
+import Label from "../Label";
+import { renderItem } from "../../utils/helper";
+import DirectorSelector from "../DirectorSelector";
+import WriterSelector from "../WriterSelector";
+import LabelWithBadge from "../LabelWithBadge";
+import ViewAllBtn from "../ViewAllButton";
 
 export const results = [
   {
@@ -57,23 +64,6 @@ export const results = [
   },
 ];
 
-/**
- * The `renderItem` function returns a JSX element that displays an image and a name.
- * @returns The function `renderItem` is returning a JSX element.
- */
-export const renderItem = (result) => {
-  return (
-    <div key={result.id} className="flex space-x-2 rounded overflow-hidden">
-      <img
-        src={result.avatar}
-        alt={result.name}
-        className="w-16 h-16 object-cover"
-      />
-      <p className="dark:text-white font-semibold">{result.name}</p>
-    </div>
-  );
-};
-
 const defaultMovieInfo = {
   title: "",
   storyLine: "",
@@ -95,8 +85,14 @@ export default function MovieForm() {
   const [showCastModal, setShowCastModal] = useState(false);
   const [showGenresModal, setshowGenresModal] = useState(false);
   const [selectedPosterForUI, setselectedPosterForUI] = useState("");
+  const [writerName, setwriterName] = useState("");
+
+  const [writersProfile, setwritersProfile] = useState([]);
+  const [directorsProfile, setdirectorsProfile] = useState([]);
 
   const { updateNotification } = useNotification();
+  const { handleSearch, searching, results, resetSearch } = useSearch();
+
   const handleSubmit = (e) => {
     // console.log(movieInfo);
     e.preventDefault();
@@ -121,7 +117,9 @@ export default function MovieForm() {
   const updateTags = (tags) => {
     setMovieInfo({ ...movieInfo, tags });
   };
-
+  const updateDirecor = (profile) => {
+    setMovieInfo({ ...movieInfo, director: profile });
+  };
   const updateCast = (castInfo) => {
     const { cast } = movieInfo;
     setMovieInfo({ ...movieInfo, cast: [...cast, castInfo] });
@@ -129,10 +127,6 @@ export default function MovieForm() {
 
   const updategenres = (genres) => {
     setMovieInfo({ ...movieInfo, genres });
-  };
-
-  const updateDirecor = (profile) => {
-    setMovieInfo({ ...movieInfo, director: profile });
   };
 
   const updateWriters = (profile) => {
@@ -147,6 +141,7 @@ export default function MovieForm() {
     }
 
     setMovieInfo({ ...movieInfo, writers: [...writers, profile] });
+    setwriterName("");
   };
 
   const hideWriterModal = () => {
@@ -191,6 +186,22 @@ export default function MovieForm() {
     setMovieInfo({ ...movieInfo, cast: [...newCast] });
   };
 
+  const handleProfileChange = ({ target }) => {
+    const { name, value } = target;
+
+    console.log(name);
+    console.log(value);
+    console.log(target);
+
+    if (name === "director") {
+      setMovieInfo({ ...movieInfo, director: { name: value } });
+      handleSearch(searchActor, value, setdirectorsProfile);
+    }
+    if (name === "writers  ") {
+      setwriterName(value);
+      handleSearch(searchActor, value, setwritersProfile);
+    }
+  };
   const {
     title,
     storyLine,
@@ -236,17 +247,7 @@ export default function MovieForm() {
             <Label htmlFor="tags">Tags</Label>
             <TagsInput value={tags} name="tags" onChange={updateTags} />
           </div>
-          <div>
-            <Label htmlFor="director">Director</Label>
-            <LiveSearch
-              name="director"
-              value={director.name}
-              placeholder="Search profile"
-              results={results}
-              renderItem={renderItem}
-              onSelect={updateDirecor}
-            />
-          </div>
+          <DirectorSelector onSelect={updateDirecor} />
           <div>
             <div className="flex justify-between">
               <LabelWithBadge badge={writers.length} htmlFor="writers">
@@ -259,13 +260,7 @@ export default function MovieForm() {
                 View All
               </ViewAllBtn>
             </div>
-            <LiveSearch
-              name="writers"
-              placeholder="Search profile"
-              results={results}
-              renderItem={renderItem}
-              onSelect={updateWriters}
-            />
+            <WriterSelector onSelect={updateWriters} />
           </div>
           <div>
             <div className="flex justify-between">
@@ -342,44 +337,3 @@ export default function MovieForm() {
     </>
   );
 }
-
-const Label = ({ children, htmlFor }) => {
-  return (
-    <label
-      htmlFor={htmlFor}
-      className="dark:text-dark-subtle text-light-subtle font-semibold"
-    >
-      {children}
-    </label>
-  );
-};
-
-const LabelWithBadge = ({ children, htmlFor, badge = 0 }) => {
-  const renderBadge = () => {
-    if (!badge) return null;
-    return (
-      <span className="dark:bg-dark-subtle bg-light-subtle text-white absolute top-0 right-0 translate-x-2 -translate-y-1 text-xs w-5 h-5 rounded-full flex justify-center items-center">
-        {badge <= 9 ? badge : "9+"}
-      </span>
-    );
-  };
-  return (
-    <div className="relative">
-      <Label htmlFor={htmlFor}>{children}</Label>
-      {renderBadge()}
-    </div>
-  );
-};
-
-const ViewAllBtn = ({ visible, children, onClick }) => {
-  if (!visible) return null;
-  return (
-    <button
-      onClick={onClick}
-      type="button"
-      className="dark:text-white text-primary hover:underline transition"
-    >
-      {children}
-    </button>
-  );
-};

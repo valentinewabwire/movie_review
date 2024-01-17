@@ -27,7 +27,7 @@ export default function MovieUpload({ visible, onClose }) {
     setvideoUploaded(true);
     setVideoInfo({ url, public_id });
   };
-  console.log(videoInfo);
+  //console.log(videoInfo);
 
   const handleChange = (file) => {
     const formData = new FormData();
@@ -46,7 +46,7 @@ export default function MovieUpload({ visible, onClose }) {
   };
 
   return (
-    <ModalContainer visible={visible} onClose={onClose}>
+    <ModalContainer visible={visible}>
       {/* <UploadProgress
           visible={!videoUploaded && videoSelected}
           message={getUploadProgressValue()}

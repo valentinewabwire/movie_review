@@ -27,7 +27,7 @@ exports.createActor = async (req, res) => {
 
   /* This is saving the new actor to the database and then returning the new actor's information. for front end purposes */
   await newActor.save();
-  res.status(201).json(formatActor(newActor));
+  res.status(201).json({ actor: formatActor(newActor) });
 };
 
 /* The updateActor code is updating the actor. */
@@ -99,7 +99,7 @@ exports.searchActor = async (req, res) => {
   const result = await Actor.find({ $text: { $search: `"${query.name}"` } });
 
   const actors = result.map((actor) => formatActor(actor));
-  res.json(actors);
+  res.json({ results: actors });
 };
 
 /* This is a function that is getting the latest actors. */

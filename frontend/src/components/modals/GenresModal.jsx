@@ -24,10 +24,7 @@ export default function GenresModal({
   };
 
   const handleSubmit = () => {
-    console.log("selectedGenres");
     onSubmit(selectedGenres);
-    console.log("selectedGenres");
-    console.log(selectedGenres);
     onClose();
   };
 
